@@ -12,6 +12,8 @@ Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn
 $StartDate = (Get-Date)
 $msapiclient = New-MSApiClient -Username $MailstoreAdminUser -Password $MailstoreUserPW -Server $MailstoreServer -Port $MailstoreServerport -IgnoreInvalidSSLCerts
 $MailstoreUsers = (Invoke-MSApiCall $msapiclient "GetUsers").result
+$useradd = 0
+$userdel = 0
 foreach ($MailstoreUser in $MailstoreUsers){
     if ($MailstoreUser.userName -ne "a_ender"){
     Write-Host "Start user -> " $MailstoreUser.userName
@@ -51,8 +53,10 @@ foreach ($MailstoreUser in $MailstoreUsers){
             if ($found -eq $false){
                 #UserLöschen
                 if ($OnlyDisplayOut){
+                    $userdel += 1
                     write-Host "Delete user" $MailStoreFolderUser
                 }else{
+                    $userdel += 1
                     write-Host "Delete user" $MailStoreFolderUser
                     $returnDelete = Invoke-MSApiCall $msapiclient "SetUserPrivilegesOnFolder" @{userName = $MailstoreUser.userName;folder = $MailStoreFolderUser;privileges = "none"}
                     $returnDelete.statusCode 
@@ -71,8 +75,10 @@ foreach ($MailstoreUser in $MailstoreUsers){
             if ($found -eq $false){
             #User hinzufügen
             if ($OnlyDisplayOut){
+                $useradd += 1
                 write-Host "Add user" $EXpostfach
             }else{
+                $useradd += 1
                 write-Host "Add user" $EXpostfach
                 $returnAdd = Invoke-MSApiCall $msapiclient "SetUserPrivilegesOnFolder" @{userName = $MailstoreUser.userName;folder = $EXpostfach;privileges = "read"}
                 $returnADD.statusCode
@@ -83,4 +89,6 @@ foreach ($MailstoreUser in $MailstoreUsers){
     }
 }
 $Time = NEW-TIMESPAN –Start $StartDate –End (Get-Date)
+Write-Host "User add -> " $useradd
+Write-Host "User del -> " $userdel
 Write-Host "Time needed" $Time.Minutes "min" $Time.Seconds "s"
