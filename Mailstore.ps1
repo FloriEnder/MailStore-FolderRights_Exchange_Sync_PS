@@ -80,7 +80,7 @@ foreach ($MailstoreUser in $MailstoreUsers){
             }else{
                 $useradd += 1
                 write-Host "Add user" $EXpostfach
-                $returnAdd = Invoke-MSApiCall $msapiclient "SetUserPrivilegesOnFolder" @{userName = $MailstoreUser.userName;folder = $EXpostfach;privileges = "read"}
+                $returnAdd = Invoke-MSApiCall $msapiclient "SetUserPrivilegesOnFolder" @{userName = $MailstoreUser.userName;folder = $EXpostfach.ToLower();privileges = "read"}
                 $returnADD.statusCode
             }            
             }
